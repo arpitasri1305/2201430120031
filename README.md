@@ -1,70 +1,101 @@
-# Getting Started with Create React App
+# filesize.js
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![build status](https://secure.travis-ci.org/avoidwork/filesize.js.svg)](http://travis-ci.org/avoidwork/filesize.js)  [![downloads](https://img.shields.io/npm/dt/filesize.svg)](https://www.npmjs.com/package/filesize) [![CDNJS version](https://img.shields.io/cdnjs/v/filesize.svg)](https://cdnjs.com/libraries/filesize)
 
-## Available Scripts
+filesize.js provides a simple way to get a human readable file size string from a number (float or integer) or string.
 
-In the project directory, you can run:
+## Optional settings
 
-### `npm start`
+`filesize()` accepts an optional descriptor Object as a second argument, so you can customize the output.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### base
+_*(number)*_ Number base, default is `10`
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### bits
+_*(boolean)*_ Enables `bit` sizes, default is `false`
 
-### `npm test`
+### exponent
+_*(number)*_ Specifies the symbol via exponent, e.g. `2` is `MB` for base 2, default is `-1`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### fullform
+_*(boolean)*_ Enables full form of unit of measure, default is `false`
 
-### `npm run build`
+### fullforms
+_*(array)*_ Array of full form overrides, default is `[]`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### locale (overrides 'separator')
+_*(string || boolean)*_ BCP 47 language tag to specify a locale, or `true` to use default locale, default is `""`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### localeOptions (overrides 'separator', requires string for 'locale' option)
+_*(object)*_ Dictionary of options defined by ECMA-402 ([Number.prototype.toLocaleString](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/toLocaleString)). Requires locale option to be explicitly passed as a string, otherwise is ignored.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### output
+_*(string)*_ Output of function (`array`, `exponent`, `object`, or `string`), default is `string`
 
-### `npm run eject`
+### pad
+_*(boolean)*_ Decimal place end padding, default is `false`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### precision
+_*(number)*_ Sets precision of numerical output, default is `0`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### round
+_*(number)*_ Decimal place, default is `2`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### roundingMethod
+_*(string)*_ Rounding method, can be `round`, `floor`, or `ceil`, default is `round`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### separator
+_*(string)*_ Decimal separator character, default is `.`
 
-## Learn More
+### spacer
+_*(string)*_ Character between the `result` and `symbol`, default is `" "`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### standard
+_*(string)*_ Standard unit of measure, can be `iec` or `jedec`, default is `iec`; can be overruled by `base`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### symbols
+_*(object)*_ Dictionary of IEC/JEDEC symbols to replace for localization, defaults to english if no match is found
 
-### Code Splitting
+### unix
+_*(boolean)*_ Enables unix style human readable output, e.g `ls -lh`, default is `false`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Examples
 
-### Analyzing the Bundle Size
+```javascript
+filesize(500);                        // "500 B"
+filesize(500, {bits: true});          // "4 kbit"
+filesize(265318, {base: 2});          // "259.1 KiB"
+filesize(265318);                     // "265.32 kB"
+filesize(265318, {round: 0});         // "265 kB"
+filesize(265318, {output: "array"});  // [265.32, "kB"]
+filesize(265318, {output: "object"}); // {value: 265.32, symbol: "kB", exponent: 1, unit: "kB"}
+filesize(1, {symbols: {B: "Б"}});     // "1 Б"
+filesize(1024);                       // "1.02 kB"
+filesize(1024, {exponent: 0});        // "1024 B"
+filesize(1024, {output: "exponent"}); // 1
+filesize(265318, {standard: "jedec"});  // "259.1 KB"
+filesize(265318, {base: 2, fullform: true}); // "259.1 kibibytes"
+filesize(12, {fullform: true, fullforms: ["байтов"]});  // "12 байтов"
+filesize(265318, {separator: ","});   // "265,32 kB"
+filesize(265318, {locale: "de"});   // "265,32 kB"
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Partial Application
+`filesize.partial()` takes the second parameter of `filesize()` and returns a new function with the configuration applied 
+upon execution. This can be used to reduce `Object` creation if you call `filesize()` without caching the `descriptor` 
+in lexical scope.
 
-### Making a Progressive Web App
+```javascript
+const size = filesize.partial({base: 2, standard: "jedec"});
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+size(265318); // "259.1 KB"
+```
 
-### Advanced Configuration
+## How can I load filesize.js?
+filesize.js supports AMD loaders (require.js, curl.js, etc.), node.js & npm (```npm install filesize```), or using a script tag.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+An ES6 version is bundled with an npm install, but requires you load it with the full path, e.g. `require(path.join(__dirname, 'node_modules', 'filesize', 'lib', 'filesize.es6.js'))`.
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## License
+Copyright (c) 2022 Jason Mulligan
+Licensed under the BSD-3 license.
